@@ -4,7 +4,7 @@
 #include "ps.h"
 
 #ifndef DISABLE_DPDK
-#define DISABLE DPDK
+#define DISABLE_DPDK
 #endif
 
 int num_cpus;
