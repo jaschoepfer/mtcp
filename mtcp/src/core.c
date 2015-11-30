@@ -1190,6 +1190,7 @@ InitializeMTCPManager(struct mtcp_thread_context* ctx)
 static void *
 MTCPRunThread(void *arg)
 {
+	TRACE_CONFIG("MTCPRunThread launched");
 	mctx_t mctx = (mctx_t)arg;
 	int cpu = mctx->cpu;
 	int working;
@@ -1197,7 +1198,9 @@ MTCPRunThread(void *arg)
 	struct mtcp_thread_context *ctx;
 
 	/* affinitize the thread to this core first */
+	TRACE_CONFIG("begin affinitizing core %i",cpu);
 	mtcp_core_affinitize(cpu);
+	TRACE_CONFIG("done affinitizing core %i",cpu);
 
 	/* memory alloc after core affinitization would use local memory
 	   most time */
@@ -1319,18 +1322,23 @@ mtcp_create_context(int cpu)
 	/* Wake up mTCP threads (wake up I/O threads) */
 	if (current_iomodule_func == &dpdk_module_func) {
 #ifndef DISABLE_DPDK
+		TRACE_CONFIG("current_iomodule_func == &dpdk_module_func");
 		int master;
 		master = rte_get_master_lcore();
 		if (master == cpu) {
 			lcore_config[master].ret = 0;
 			lcore_config[master].state = FINISHED;
+			TRACE_CONFIG("creating thread with pthread");
 			if (pthread_create(&g_thread[cpu], 
 					   NULL, MTCPRunThread, (void *)mctx) != 0) {
 				TRACE_ERROR("pthread_create of mtcp thread failed!\n");
 				return NULL;
 			}
 		} else
+		{
+			TRACE_CONFIG("creating thread with rte_eal_remote_launch");
 			rte_eal_remote_launch(MTCPDPDKRunThread, mctx, cpu);
+		}
 #endif /* !DISABLE_DPDK */
 	} else {
 		if (pthread_create(&g_thread[cpu], 
@@ -1339,8 +1347,9 @@ mtcp_create_context(int cpu)
 			return NULL;
 		}
 	}
-
+	TRACE_CONFIG("begin waiting for cpu %i...", cpu);
 	sem_wait(&g_init_sem[cpu]);
+	TRACE_CONFIG("done waiting for %i", cpu);
 	sem_destroy(&g_init_sem[cpu]);
 
 	running[cpu] = TRUE;

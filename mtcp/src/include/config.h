@@ -3,10 +3,6 @@
 
 #include "ps.h"
 
-#ifndef DISABLE_DPDK
-#define DISABLE_DPDK
-#endif
-
 int num_cpus;
 int num_queues;
 int num_devices;

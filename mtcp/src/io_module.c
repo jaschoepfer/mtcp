@@ -150,6 +150,7 @@ SetInterfaceInfo(char* dev_name_list)
 		}
 	} else if (current_iomodule_func == &dpdk_module_func) {
 #ifndef DISABLE_DPDK
+		/*return 0; //code needs to be disabled, but DISABLE_DPDK is not needed
 		int cpu = CONFIG.num_cores;
 		uint32_t cpumask = 0;
 		char cpumaskbuf[10];
@@ -157,12 +158,12 @@ SetInterfaceInfo(char* dev_name_list)
 		int ret;
 		static struct ether_addr ports_eth_addr[RTE_MAX_ETHPORTS];
 		
-		/* get the cpu mask */
+		// get the cpu mask
 		for (ret = 0; ret < cpu; ret++)
 			cpumask = (cpumask | (1 << ret));
 		sprintf(cpumaskbuf, "%X", cpumask);
 
-		/* get the mem channels per socket */
+		// get the mem channels per socket
 		if (CONFIG.num_mem_ch == 0) {
 			TRACE_ERROR("DPDK module requires # of memory channels "
 				    "per socket parameter!\n");
@@ -170,7 +171,7 @@ SetInterfaceInfo(char* dev_name_list)
 		}
 		sprintf(mem_channels, "%d", CONFIG.num_mem_ch);
 
-		/* initialize the rte env first, what a waste of implementation effort!  */
+		// initialize the rte env first, what a waste of implementation effort!
 		char *argv[] = {"", 
 				"-c", 
 				cpumaskbuf, 
@@ -181,28 +182,28 @@ SetInterfaceInfo(char* dev_name_list)
 		};
 		const int argc = 6;
 
-		/* 
-		 * re-set getopt extern variable optind.
-		 * this issue was a bitch to debug
-		 * rte_eal_init() internally uses getopt() syscall
-		 * mtcp applications that also use an `external' getopt
-		 * will cause a violent crash if optind is not reset to zero
-		 * prior to calling the func below...
-		 * see man getopt(3) for more details
-		 */
+		
+		 //re-set getopt extern variable optind.
+		 //this issue was a bitch to debug
+		 //rte_eal_init() internally uses getopt() syscall
+		 //mtcp applications that also use an `external' getopt
+		 //will cause a violent crash if optind is not reset to zero
+		 //prior to calling the func below...
+		 //see man getopt(3) for more details
+		 //
 		optind = 0;
 
-		/* initialize the dpdk eal env */
+		// initialize the dpdk eal env *
 		ret = rte_eal_init(argc, argv);
 		if (ret < 0)
 			rte_exit(EXIT_FAILURE, "Invalid EAL args!\n");
-		/* give me the count of 'detected' ethernet ports */
+		// give me the count of 'detected' ethernet ports *
 		num_devices = rte_eth_dev_count();
 		if (num_devices == 0) {
 			rte_exit(EXIT_FAILURE, "No Ethernet port!\n");
 		}
 		
-		/* get mac addr entries of 'detected' dpdk ports */
+		// get mac addr entries of 'detected' dpdk ports *
 		for (ret = 0; ret < num_devices; ret++)
 			rte_eth_macaddr_get(ret, &ports_eth_addr[ret]);
 		
@@ -222,22 +223,22 @@ SetInterfaceInfo(char* dev_name_list)
 			if (iter_if->ifa_addr->sa_family == AF_INET &&
 			    !set_all_inf && 
 			    (seek=strstr(dev_name_list, iter_if->ifa_name)) != NULL &&
-			    /* check if the interface was not aliased */
+			    // check if the interface was not aliased *
 			    *(seek + strlen(iter_if->ifa_name)) != ':') {
 				struct ifreq ifr;
 				
-				/* Setting informations */
+				// Setting informations *
 				eidx = CONFIG.eths_num++;
 				strcpy(CONFIG.eths[eidx].dev_name, iter_if->ifa_name);
 				strcpy(ifr.ifr_name, iter_if->ifa_name);
 
-				/* Create socket */
+				// Create socket *
 				int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
 				if (sock == -1) {
 					perror("socket");
 				}			
 				
-				/* getting address */
+				// getting address *
 				if (ioctl(sock, SIOCGIFADDR, &ifr) == 0 ) {
 					struct in_addr sin = ((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr;
 					CONFIG.eths[eidx].ip_addr = *(uint32_t *)&sin;
@@ -249,7 +250,7 @@ SetInterfaceInfo(char* dev_name_list)
 					}
 				}
 
-				/* Net MASK */
+				// Net MASK /
 				if (ioctl(sock, SIOCGIFNETMASK, &ifr) == 0) {
 					struct in_addr sin = ((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr;
 					CONFIG.eths[eidx].netmask = *(uint32_t *)&sin;
@@ -262,7 +263,7 @@ SetInterfaceInfo(char* dev_name_list)
 						CONFIG.eths[eidx].ifindex = j;
 				}
 					    
-				/* add to attached devices */
+				// add to attached devices *
 				for (j = 0; j < num_devices_attached; j++) {
 					if (devices_attached[j] == CONFIG.eths[eidx].ifindex) {
 						break;
@@ -279,7 +280,7 @@ SetInterfaceInfo(char* dev_name_list)
 		} while (iter_if != NULL);
 		
 		freeifaddrs(ifap);
-#endif /* !DISABLE_DPDK */
+#endif /*!DISABLE_DPDK */
 	}
 	return 0;
 }
