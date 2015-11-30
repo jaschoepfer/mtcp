@@ -293,10 +293,10 @@ dpdk_get_wptr(struct mtcp_thread_context *ctxt, int nif, uint16_t pktsize)
 	
 	/* retrieve the right write offset */
 	ptr = (void *)rte_pktmbuf_mtod(m, struct ether_hdr *);
-	/*m->pkt_len =*/ m->data_len = pktsize;
-	//m->nb_segs = 1;
-	//m->next = NULL;
-	//fields pkt_len, db_segs and next not supported by DPDK version
+	m->pkt.pkt_len = m->pkt.data_len = pktsize;
+	m->pkt.nb_segs = 1;
+	m->pkt.next = NULL;
+	//fields pkt_len, db_segs and next moved to rte_pktmbuf pkt
 
 #ifdef NETSTAT
 	mtcp->nstat.tx_bytes[nif] += pktsize + 24;
@@ -353,7 +353,7 @@ dpdk_get_rptr(struct mtcp_thread_context *ctxt, int ifidx, int index, uint16_t *
 
 	m = dpc->pkts_burst[index];
 	//rte_prefetch0(rte_pktmbuf_mtod(m, void *));
-	*len = m->data_len/*pkt_len*/; //field pkt_len not supported by DPDK version
+	*len = m->pkt.pkt_len; //field pkt_len moved to pkt_mbuf pkt
 	pktbuf = rte_pktmbuf_mtod(m, uint8_t *);
 
 	/* enqueue the pkt ptr in mbuf */
