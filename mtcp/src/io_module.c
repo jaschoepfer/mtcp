@@ -279,7 +279,7 @@ SetInterfaceInfo(char* dev_name_list)
 			iter_if = iter_if->ifa_next;
 		} while (iter_if != NULL);
 		
-		freeifaddrs(ifap);
+		freeifaddrs(ifap);*/
 #endif /*!DISABLE_DPDK */
 	}
 	return 0;
