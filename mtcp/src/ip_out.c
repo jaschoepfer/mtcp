@@ -3,6 +3,7 @@
 #include "eth_out.h"
 #include "arp.h"
 #include "debug.h"
+#include "config.h"
 
 /*----------------------------------------------------------------------------*/
 inline int
@@ -12,8 +13,15 @@ GetOutputInterface(uint32_t daddr)
 	int i;
 	int prefix = 0;
 
+	TRACE_CONFIG("MAX_DEVICES = %i",MAX_DEVICES);
+	for(i = 0; i < num_devices; i++)
+	{
+		TRACE_CONFIG("DEVICE %i: %s\n", i, CONFIG.eths[i].dev_name);
+	}
+
 	/* Longest prefix matching */
 	for (i = 0; i < CONFIG.routes; i++) {
+		TRACE_CONFIG("ROUTE %i = %i\n", i, CONFIG.rtable[i].nif);
 		if ((daddr & CONFIG.rtable[i].mask) == CONFIG.rtable[i].masked) {
 			if (CONFIG.rtable[i].prefix > prefix) {
 				nif = CONFIG.rtable[i].nif;

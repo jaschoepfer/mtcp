@@ -149,17 +149,17 @@ SetInterfaceInfo(char* dev_name_list)
 			return -1;
 		}
 	} else if (current_iomodule_func == &dpdk_module_func) {
-		//extracted from commented block, num_queues initialization is necessary
-		num_queues = MIN(CONFIG.num_cores, MAX_CPUS);
 
 #ifndef DISABLE_DPDK
-
-		/*return 0; //code needs to be disabled, but DISABLE_DPDK is not needed
-		int cpu = CONFIG.num_cores;
+		
+		int ret;
+		
+		//eal_init code clashes with MoonGen and needs to be disabled, but DISABLE_DPDK is not needed
+		
+		/*int cpu = CONFIG.num_cores;
 		uint32_t cpumask = 0;
 		char cpumaskbuf[10];
 		char mem_channels[5];
-		int ret;
 		static struct ether_addr ports_eth_addr[RTE_MAX_ETHPORTS];
 		
 		// get the cpu mask
@@ -195,8 +195,10 @@ SetInterfaceInfo(char* dev_name_list)
 		 //prior to calling the func below...
 		 //see man getopt(3) for more details
 		 //
+		*/
 		optind = 0;
-
+		
+		
 		// initialize the dpdk eal env *
 		ret = rte_eal_init(argc, argv);
 		if (ret < 0)
@@ -212,7 +214,7 @@ SetInterfaceInfo(char* dev_name_list)
 			rte_eth_macaddr_get(ret, &ports_eth_addr[ret]);
 		
 		
-		num_queues = MIN(CONFIG.num_cores, MAX_CPUS);//if uncommented, remove duplicate at beginning of if-block
+		num_queues = MIN(CONFIG.num_cores, MAX_CPUS);
 		
 		struct ifaddrs *ifap;
 		struct ifaddrs *iter_if;
@@ -284,7 +286,7 @@ SetInterfaceInfo(char* dev_name_list)
 			iter_if = iter_if->ifa_next;
 		} while (iter_if != NULL);
 		
-		freeifaddrs(ifap);*/
+		freeifaddrs(ifap);
 #endif /*!DISABLE_DPDK */
 	}
 	return 0;

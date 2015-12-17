@@ -96,6 +96,7 @@ GetDestinationHWaddr(uint32_t dip)
 
 	/* Longest prefix matching */
 	for (i = 0; i < CONFIG.arp.entries; i++) {
+		TRACE_CONFIG("ARP ENTRY %i = %i\n", i, CONFIG.arp.entry[i]);
 		if (CONFIG.arp.entry[i].prefix == 1) {
 			if (CONFIG.arp.entry[i].ip == dip) {
 				d_haddr = CONFIG.arp.entry[i].haddr;
