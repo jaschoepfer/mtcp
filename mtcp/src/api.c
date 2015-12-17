@@ -531,6 +531,7 @@ int
 mtcp_connect(mctx_t mctx, int sockid, 
 		const struct sockaddr *addr, socklen_t addrlen)
 {
+	TRACE_CONFIG("mtcp_connect called\n");
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
 	tcp_stream *cur_stream;
@@ -591,14 +592,17 @@ mtcp_connect(mctx_t mctx, int sockid,
 	dip = addr_in->sin_addr.s_addr;
 	dport = addr_in->sin_port;
 
+	TRACE_CONFIG("bindig adress...\n");
 	/* address binding */
+	TRACE_CONFIG("%i",socket->opts & MTCP_ADDR_BIND);
 	if (socket->opts & MTCP_ADDR_BIND) {
 		int rss_core;
 		uint8_t endian_check = (current_iomodule_func == &dpdk_module_func) ?
 			0 : 1;
-	
+		TRACE_CONFIG("before func");
 		rss_core = GetRSSCPUCore(socket->saddr.sin_addr.s_addr, dip, 
 					 socket->saddr.sin_port, dport, num_queues, endian_check);
+		TRACE_CONFIG("after func");
 
 		if (rss_core != mctx->cpu) {
 			errno = EINVAL;
@@ -606,20 +610,26 @@ mtcp_connect(mctx_t mctx, int sockid,
 		}
 	} else {
 		if (mtcp->ap) {
+			TRACE_CONFIG("option 1");
 			ret = FetchAddress(mtcp->ap, 
 					mctx->cpu, num_queues, addr_in, &socket->saddr);
 		} else {
+			TRACE_CONFIG("option 2");
 			ret = FetchAddress(ap, 
 					mctx->cpu, num_queues, addr_in, &socket->saddr);
+			
+
 		}
 		if (ret < 0) {
 			errno = EAGAIN;
 			return -1;
+
 		}
 		socket->opts |= MTCP_ADDR_BIND;
 		is_dyn_bound = TRUE;
 	}
 
+	TRACE_CONFIG("calling CreateTCPStream()...");
 	cur_stream = CreateTCPStream(mtcp, socket, socket->socktype, 
 			socket->saddr.sin_addr.s_addr, socket->saddr.sin_port, dip, dport);
 	if (!cur_stream) {
@@ -628,6 +638,7 @@ mtcp_connect(mctx_t mctx, int sockid,
 		return -1;
 	}
 
+	TRACE_CONFIG("Enqueuing to connect queue\n");
 	if (is_dyn_bound)
 		cur_stream->is_bound_addr = TRUE;
 	cur_stream->sndvar->cwnd = 1;

@@ -149,7 +149,11 @@ SetInterfaceInfo(char* dev_name_list)
 			return -1;
 		}
 	} else if (current_iomodule_func == &dpdk_module_func) {
+		//extracted from commented block, num_queues initialization is necessary
+		num_queues = MIN(CONFIG.num_cores, MAX_CPUS);
+
 #ifndef DISABLE_DPDK
+
 		/*return 0; //code needs to be disabled, but DISABLE_DPDK is not needed
 		int cpu = CONFIG.num_cores;
 		uint32_t cpumask = 0;
@@ -207,8 +211,9 @@ SetInterfaceInfo(char* dev_name_list)
 		for (ret = 0; ret < num_devices; ret++)
 			rte_eth_macaddr_get(ret, &ports_eth_addr[ret]);
 		
-		num_queues = MIN(CONFIG.num_cores, MAX_CPUS);
-
+		
+		num_queues = MIN(CONFIG.num_cores, MAX_CPUS);//if uncommented, remove duplicate at beginning of if-block
+		
 		struct ifaddrs *ifap;
 		struct ifaddrs *iter_if;
 		char *seek;

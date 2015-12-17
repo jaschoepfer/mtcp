@@ -100,7 +100,7 @@ CreateAddressPool(in_addr_t addr_base, int num_addr)
 	ap->num_used = 0;
 	
 	pthread_mutex_unlock(&ap->lock);
-
+	
 	return ap;
 }
 /*----------------------------------------------------------------------------*/
@@ -230,6 +230,14 @@ FetchAddress(addr_pool_t ap, int core, int num_queues,
 	walk = TAILQ_FIRST(&ap->free_list);
 	while (walk) {
 		next = TAILQ_NEXT(walk, addr_link);
+		TRACE_CONFIG("GetRSSCPUCore...\n");
+		TRACE_CONFIG("1: %i\n", ntohl(walk->addr.sin_addr.s_addr));
+		TRACE_CONFIG("2: %i\n", ntohl(daddr->sin_addr.s_addr));
+		TRACE_CONFIG("3: %i\n", ntohs(walk->addr.sin_port));
+		TRACE_CONFIG("4: %i\n", ntohs(daddr->sin_port));
+		TRACE_CONFIG("5 numques: %i\n", num_queues);
+		TRACE_CONFIG("6 endian: %i\n", endian_check);
+
 
 		rss_core = GetRSSCPUCore(ntohl(walk->addr.sin_addr.s_addr), 
 					 ntohl(daddr->sin_addr.s_addr), ntohs(walk->addr.sin_port), 
@@ -241,6 +249,7 @@ FetchAddress(addr_pool_t ap, int core, int num_queues,
 		walk = next;
 	}
 
+	TRACE_CONFIG("Exit while loop");
 	if (walk) {
 		*saddr = walk->addr;
 		TAILQ_REMOVE(&ap->free_list, walk, addr_link);
