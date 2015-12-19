@@ -153,14 +153,16 @@ SetInterfaceInfo(char* dev_name_list)
 #ifndef DISABLE_DPDK
 		
 		int ret;
+		static struct ether_addr ports_eth_addr[RTE_MAX_ETHPORTS];
 		
-		//eal_init code clashes with MoonGen and needs to be disabled, but DISABLE_DPDK is not needed
+		//
 		
-		/*int cpu = CONFIG.num_cores;
+		/* eal_init is already called in MoonGen *
+		
+		int cpu = CONFIG.num_cores;
 		uint32_t cpumask = 0;
 		char cpumaskbuf[10];
 		char mem_channels[5];
-		static struct ether_addr ports_eth_addr[RTE_MAX_ETHPORTS];
 		
 		// get the cpu mask
 		for (ret = 0; ret < cpu; ret++)
@@ -195,7 +197,7 @@ SetInterfaceInfo(char* dev_name_list)
 		 //prior to calling the func below...
 		 //see man getopt(3) for more details
 		 //
-		*/
+		
 		optind = 0;
 		
 		
@@ -203,6 +205,9 @@ SetInterfaceInfo(char* dev_name_list)
 		ret = rte_eal_init(argc, argv);
 		if (ret < 0)
 			rte_exit(EXIT_FAILURE, "Invalid EAL args!\n");
+		
+		* eal_init is already called in MoonGen*/
+		
 		// give me the count of 'detected' ethernet ports *
 		num_devices = rte_eth_dev_count();
 		if (num_devices == 0) {
