@@ -13,15 +13,22 @@ GetOutputInterface(uint32_t daddr)
 	int i;
 	int prefix = 0;
 
-	TRACE_CONFIG("MAX_DEVICES = %i",MAX_DEVICES);
-	for(i = 0; i < num_devices; i++)
-	{
-		TRACE_CONFIG("DEVICE %i: %s\n", i, CONFIG.eths[i].dev_name);
-	}
-
 	/* Longest prefix matching */
+	unsigned char *helper = (unsigned char *)&daddr;
+	TRACE_CONFIG("OUR DADDR: %i.%i.%i.%i\n",helper[0],helper[1],helper[2],helper[3]);
 	for (i = 0; i < CONFIG.routes; i++) {
-		TRACE_CONFIG("ROUTE %i = %i\n", i, CONFIG.rtable[i].nif);
+		TRACE_CONFIG("----ROUTE %i----\n", i);
+		//daddr
+		helper = (unsigned char *)&CONFIG.rtable[i].daddr;
+		TRACE_CONFIG("DADDR: %i.%i.%i.%i\n",helper[0],helper[1],helper[2],helper[3]);
+		//mask
+		helper = (unsigned char *)&CONFIG.rtable[i].mask;
+		TRACE_CONFIG("MASK: %i.%i.%i.%i\n",helper[0],helper[1],helper[2],helper[3]);
+		//masked
+		helper = (unsigned char *)&CONFIG.rtable[i].masked;
+		TRACE_CONFIG("MASKED: %i.%i.%i.%i\n",helper[0],helper[1],helper[2],helper[3]);
+		//prefix & nif
+		TRACE_CONFIG("PREFIX: %i\nNIF: %i\n", CONFIG.rtable[i].prefix, CONFIG.rtable[i].nif);
 		if ((daddr & CONFIG.rtable[i].mask) == CONFIG.rtable[i].masked) {
 			if (CONFIG.rtable[i].prefix > prefix) {
 				nif = CONFIG.rtable[i].nif;

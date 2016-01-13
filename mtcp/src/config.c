@@ -87,7 +87,9 @@ EnrollRouteTableEntry(char *optstr)
 			exit(4);
 		}
 	} else if (current_iomodule_func == &dpdk_module_func) {
+		TRACE_CONFIG("=== === ===listing %i device names to match %s=== === ===\n", num_devices, dev);
 		for (i = 0; i < num_devices; i++) {
+			TRACE_CONFIG("device %i: %s\n", i, CONFIG.eths[i].dev_name);
 			if (strcmp(CONFIG.eths[i].dev_name, dev))
 				continue;
 			ifidx = CONFIG.eths[i].ifindex;
@@ -526,6 +528,7 @@ ParseConfiguration(char *line)
 			}
 		}
 	} else if (strcmp(p, "port") == 0) {
+		TRACE_CONFIG("Port: %s\n all_string: %s\n line: %s\n", q, ALL_STRING, line);
 		if(strncmp(q, ALL_STRING, sizeof(ALL_STRING)) == 0) {
 			SetInterfaceInfo(q);
 		} else {
@@ -597,6 +600,13 @@ LoadConfiguration(char *fname)
 		if (ParseConfiguration(p) < 0)
 			return -1;
 	}
+
+	//TEST PRINT
+	int i = 0;
+	for(i = 0; i < CONFIG.eths_num; i++)
+	{
+		TRACE_CONFIG("DEVICE %i: %s\n",i, CONFIG.eths[i].dev_name);
+	}	
 
 	fclose(fp);
 

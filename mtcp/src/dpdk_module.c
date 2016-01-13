@@ -526,6 +526,7 @@ dpdk_load_module(void)
 			/* init port */
 			printf("Initializing port %u... ", (unsigned) portid);
 			fflush(stdout);
+			TRACE_CONFIG("calling rte_eth_dev_conf with 4 queues\n",CONFIG.num_cores);
 			ret = rte_eth_dev_configure(portid, CONFIG.num_cores, CONFIG.num_cores, &port_conf);
 			if (ret < 0)
 				rte_exit(EXIT_FAILURE, "Cannot configure device: err=%d, port=%u\n",
