@@ -759,16 +759,15 @@ WriteTCPACKList(mtcp_manager_t mtcp,
 /*----------------------------------------------------------------------------*/
 inline struct mtcp_sender *
 GetSender(mtcp_manager_t mtcp, tcp_stream *cur_stream)
-{
-	TRACE_CONFIG("NIF_OUT %i\n", cur_stream->sndvar->nif_out);
+{	
 	if (cur_stream->sndvar->nif_out < 0) {
 		return mtcp->g_sender;
 
-	/*} else if (cur_stream->sndvar->nif_out >= CONFIG.eths_num) {
+	} /*else if (cur_stream->sndvar->nif_out >= CONFIG.num_devices) {
 		TRACE_ERROR("(NEVER HAPPEN) Failed to find appropriate sender.\n");
 		return NULL;
-	//Error removed, since eths_num seems to be set incorrectly */
-	} else {
+	//Error may have to beremoved, since eths_num seems to be set incorrectly
+	} */else {
 		return mtcp->n_sender[cur_stream->sndvar->nif_out];
 	}
 }

@@ -231,6 +231,8 @@ SetInterfaceInfo(char* dev_name_list)
 			exit(EXIT_FAILURE);
 		}
 		
+		int dev_c = 0;
+				
 		iter_if = ifap;
 		do {
 			//TRACE_CONFIG("++++++++++++++++++++++++++strstr arguments:+++++++++++++++++++++++\ndev_name_list = \"%s\" iter_if->ifa_name = \"%s\"\n", dev_name_list, iter_if->ifa_name);
@@ -240,7 +242,6 @@ SetInterfaceInfo(char* dev_name_list)
 			    (seek=strstr(dev_name_list, iter_if->ifa_name)) != NULL &&
 			    // check if the interface was not aliased (followed by ':') and isn't part of another interface *
 			    ((nxtchr=*(seek + strlen(iter_if->ifa_name))) == '\0' || strchr(":0123456789", *(seek + strlen(iter_if->ifa_name))) == NULL)) {
-				TRACE_CONFIG("+++++++++++++++++++++++%s was parsed+++++++++++++++++++++++", iter_if->ifa_name);
 				struct ifreq ifr;
 				
 				// Setting informations *
@@ -272,13 +273,13 @@ SetInterfaceInfo(char* dev_name_list)
 					CONFIG.eths[eidx].netmask = *(uint32_t *)&sin;
 				}
 				close(sock);
-				
+
 				for (j = 0; j < num_devices; j++) {
 					if (!memcmp(&CONFIG.eths[eidx].haddr[0], &ports_eth_addr[j],
 						    ETH_ALEN))
 					{
-						TRACE_CONFIG("DEVICE %s: ifindex set to %i\n", ifr.ifr_name, j);
-						CONFIG.eths[eidx].ifindex = j;
+						TRACE_CONFIG("DEVICE %s: ifindex set to %i\n", ifr.ifr_name, (dev_c+1));
+						CONFIG.eths[eidx].ifindex = dev_c++;
 					}
 				}	
 					    

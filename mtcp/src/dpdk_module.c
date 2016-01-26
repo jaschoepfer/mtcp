@@ -217,6 +217,7 @@ dpdk_release_pkt(struct mtcp_thread_context *ctxt, int ifidx, unsigned char *pkt
 int
 dpdk_send_pkts(struct mtcp_thread_context *ctxt, int nif)
 {
+	TRACE_CONFIG("dpdk_send_pkts called, nif = %i\n", nif);
 	struct dpdk_private_context *dpc;
 	mtcp_manager_t mtcp;
 	int ret, i;
@@ -246,6 +247,7 @@ dpdk_send_pkts(struct mtcp_thread_context *ctxt, int nif)
 #endif /* !ENABLE_STATS_IOCTL */
 #endif
 		do {
+			 TRACE_CONFIG("rte_eth_tx_burst called\n");
 			/* tx cnt # of packets */
 			ret = rte_eth_tx_burst(nif, ctxt->cpu, 
 					       pkts, cnt);

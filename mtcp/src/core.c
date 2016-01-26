@@ -952,6 +952,7 @@ RunMainLoop(struct mtcp_thread_context *ctx)
 #if E_PSIO
 		/* With E_PSIO, send until tx is available */
 		for (tx_inf = 0; tx_inf < CONFIG.eths_num; tx_inf++) {
+			TRACE_CONFIG("send_pkts called, tx_inf = %i\n", tx_inf);
 			mtcp->iom->send_pkts(ctx, tx_inf);
 		}
 
@@ -960,9 +961,11 @@ RunMainLoop(struct mtcp_thread_context *ctx)
 		for (i = 0; i < CONFIG.eths_num; i++) {
 #if USE_CHUNK_BUF
 			/* in the case of using ps_send_chunk_buf() without E_PSIO */
+			TRACE_CONFIG("FlushSendChunkBuf called, i = %i\n", i);
 			ret = FlushSendChunkBuf(mtcp, i);
 #else
 			/* if not using ps_send_chunk_buf() */
+			TRACE_CONFIG("FlushWriteBuf called, i = %i\n", i);
 			ret = FlushWriteBuffer(ctx, i);
 #endif
 			if (ret < 0) {
@@ -1190,7 +1193,7 @@ InitializeMTCPManager(struct mtcp_thread_context* ctx)
 static void *
 MTCPRunThread(void *arg)
 {
-	TRACE_CONFIG("MTCPRunThread launched");
+	TRACE_CONFIG("MTCPRunThread launched\n");
 	mctx_t mctx = (mctx_t)arg;
 	int cpu = mctx->cpu;
 	int working;
@@ -1198,9 +1201,9 @@ MTCPRunThread(void *arg)
 	struct mtcp_thread_context *ctx;
 
 	/* affinitize the thread to this core first */
-	TRACE_CONFIG("begin affinitizing core %i",cpu);
+	TRACE_CONFIG("begin affinitizing core %i\n",cpu);
 	mtcp_core_affinitize(cpu);
-	TRACE_CONFIG("done affinitizing core %i",cpu);
+	TRACE_CONFIG("done affinitizing core %i\n",cpu);
 
 	/* memory alloc after core affinitization would use local memory
 	   most time */

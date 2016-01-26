@@ -68,7 +68,7 @@ FlushWriteBuffer(struct mtcp_thread_context* ctx, int ifidx)
 	if (w_chunk[ifidx].cnt > 0) {
 
 		STAT_COUNT(mtcp->runstat.rounds_tx_try);
-
+		printf("eth_out.c: TRYING TO SEND CHUNK (ps_send_chunk)\n");
 		ret = ps_send_chunk(ctx->handle, &w_chunk[ifidx]);
 		drop = ctx->w_chunk[ifidx].cnt - ret;
 

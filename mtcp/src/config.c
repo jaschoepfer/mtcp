@@ -263,7 +263,7 @@ SetRoutingTable()
 		CONFIG.rtable[ridx].mask = CONFIG.eths[i].netmask;
 		CONFIG.rtable[ridx].masked = CONFIG.rtable[ridx].daddr;
 		CONFIG.rtable[ridx].nif = CONFIG.eths[ridx].ifindex;
-	}
+	}	//removing might improve flexibility for MoonGen
 
 	/* set additional routing table */
 	SetRoutingTableFromFile();

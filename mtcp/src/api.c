@@ -659,10 +659,12 @@ mtcp_connect(mctx_t mctx, int sockid,
 		errno = EAGAIN;
 		return -1;
 	}
+	TRACE_CONFIG("StreamEnqueue successful(returned %i)\n", ret);
 
 	/* if nonblocking socket, return EINPROGRESS */
 	if (socket->opts & MTCP_NONBLOCK) {
 		errno = EINPROGRESS;
+		TRACE_CONFIG("socket->opts & MTCP_NONBLOCK: '%i' & '%i' == true\n", socket->opts, MTCP_NONBLOCK);
 		return -1;
 
 	} else {
@@ -673,6 +675,7 @@ mtcp_connect(mctx_t mctx, int sockid,
 				return -1;
 			}
 			if (cur_stream->state > TCP_ST_ESTABLISHED) {
+			
 				TRACE_ERROR("Socket %d: weird state %s\n", 
 						sockid, TCPStateToString(cur_stream));
 				// TODO: how to handle this?
@@ -681,6 +684,7 @@ mtcp_connect(mctx_t mctx, int sockid,
 			}
 
 			if (cur_stream->state == TCP_ST_ESTABLISHED) {
+				TRACE_CONFIG("Connection established!\n");
 				break;
 			}
 			usleep(1000);
