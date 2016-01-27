@@ -70,7 +70,8 @@ IPOutputStandalone(struct mtcp_manager *mtcp,
 		RequestARP(mtcp, daddr, nif, mtcp->cur_ts);
 		return NULL;
 	}
-	
+	TRACE_CONFIG("IPOutputStandalone called with tcplen = %i\n", tcplen);
+
 	iph = (struct iphdr *)EthernetOutput(mtcp, 
 			ETH_P_IP, nif, haddr, tcplen + IP_HEADER_LEN);
 	if (!iph) {
@@ -120,7 +121,11 @@ IPOutput(struct mtcp_manager *mtcp, tcp_stream *stream, uint16_t tcplen)
 		RequestARP(mtcp, stream->daddr, stream->sndvar->nif_out, mtcp->cur_ts);
 		return NULL;
 	}
-	
+	uint8_t *da = (uint8_t *)&stream->daddr;
+	uint8_t *sa = (uint8_t *)&stream->saddr;
+	TRACE_CONFIG("IPOutput called with tcplen=%hi\n", tcplen);
+	TRACE_CONFIG("    Source: ipaddr=%u.%u.%u.%u, nif_out=%u\n", sa[0], sa[1], sa[2], sa[3], stream->sndvar->nif_out);
+	TRACE_CONFIG("    Dest: ipaddr=%u.%u.%u.%u, hwaddr=%hhx:%hhx:%hhx:%hhx:%hhx:%hhx\n", da[0], da[1], da[2], da[3], haddr[0], haddr[1], haddr[2], haddr[3], haddr[4], haddr[5]);
 	iph = (struct iphdr *)EthernetOutput(mtcp, ETH_P_IP, 
 			stream->sndvar->nif_out, haddr, tcplen + IP_HEADER_LEN);
 	if (!iph) {

@@ -952,7 +952,6 @@ RunMainLoop(struct mtcp_thread_context *ctx)
 #if E_PSIO
 		/* With E_PSIO, send until tx is available */
 		for (tx_inf = 0; tx_inf < CONFIG.eths_num; tx_inf++) {
-			TRACE_CONFIG("send_pkts called, tx_inf = %i\n", tx_inf);
 			mtcp->iom->send_pkts(ctx, tx_inf);
 		}
 

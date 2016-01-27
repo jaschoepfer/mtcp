@@ -173,8 +173,10 @@ dpdk_init_handle(struct mtcp_thread_context *ctxt)
 	dpc->pktmbuf_pool = pktmbuf_pool[ctxt->cpu];
 
 	/* set wmbufs correctly */
+	TRACE_CONFIG("dpdk_init_handle(...): Allocating wmbufs for %i port(s)\n", num_devices_attached);
 	for (j = 0; j < num_devices_attached; j++) {
 		/* Allocate wmbufs for each registered port */
+		TRACE_CONFIG("    allocating %i wmbufs for port %i\n", MAX_PKT_BURST, j);
 		for (i = 0; i < MAX_PKT_BURST; i++) {
 			dpc->wmbufs[j].m_table[i] = rte_pktmbuf_alloc(pktmbuf_pool[ctxt->cpu]);
 			if (dpc->wmbufs[j].m_table[i] == NULL) {
@@ -217,7 +219,6 @@ dpdk_release_pkt(struct mtcp_thread_context *ctxt, int ifidx, unsigned char *pkt
 int
 dpdk_send_pkts(struct mtcp_thread_context *ctxt, int nif)
 {
-	TRACE_CONFIG("dpdk_send_pkts called, nif = %i\n", nif);
 	struct dpdk_private_context *dpc;
 	mtcp_manager_t mtcp;
 	int ret, i;
@@ -247,7 +248,12 @@ dpdk_send_pkts(struct mtcp_thread_context *ctxt, int nif)
 #endif /* !ENABLE_STATS_IOCTL */
 #endif
 		do {
-			 TRACE_CONFIG("rte_eth_tx_burst called\n");
+			 TRACE_CONFIG("rte_eth_tx_burst called with %i packet(s)\n", cnt);
+			 int temp;
+			 for(temp = 0; temp < cnt; temp++)
+			 {
+				 TRACE_CONFIG("    pkt%i: data_len=%hi, pkt_len=%i\n", temp, pkts[temp]->pkt.data_len, pkts[temp]->pkt.pkt_len);
+			 }
 			/* tx cnt # of packets */
 			ret = rte_eth_tx_burst(nif, ctxt->cpu, 
 					       pkts, cnt);
