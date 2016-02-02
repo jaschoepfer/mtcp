@@ -39,6 +39,8 @@
 #define TCP_HEADER_LEN			20	// sizeof(struct tcphdr)
 #define TOTAL_TCP_HEADER_LEN	54	// total header length
 
+#define FIX_IFINDEX
+
 /* configrations */
 #define BACKLOG_SIZE (10*1024)
 #define MAX_PKT_SIZE (2*1024)
@@ -89,6 +91,9 @@ struct eth_table
 {
 	char dev_name[128];
 	int ifindex;
+#ifdef FIX_IFINDEX
+	int iom_ifindex;
+#endif /* FIX_IFINDEX */
 	int stat_print;
 	unsigned char haddr[ETH_ALEN];
 	uint32_t netmask;

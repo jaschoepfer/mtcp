@@ -230,9 +230,9 @@ SetInterfaceInfo(char* dev_name_list)
 			perror("getifaddrs: ");
 			exit(EXIT_FAILURE);
 		}
-		
+#ifdef FIX_IFINDEX	
 		int dev_c = 0;
-				
+#endif
 		iter_if = ifap;
 		do {
 			//TRACE_CONFIG("++++++++++++++++++++++++++strstr arguments:+++++++++++++++++++++++\ndev_name_list = \"%s\" iter_if->ifa_name = \"%s\"\n", dev_name_list, iter_if->ifa_name);
@@ -278,8 +278,13 @@ SetInterfaceInfo(char* dev_name_list)
 					if (!memcmp(&CONFIG.eths[eidx].haddr[0], &ports_eth_addr[j],
 						    ETH_ALEN))
 					{
+#ifdef FIX_IFINDEX
 						TRACE_CONFIG("DEVICE %s: ifindex set to %i\n", ifr.ifr_name, (dev_c+1));
-						CONFIG.eths[eidx].ifindex = dev_c++;
+						CONFIG.eths[eidx].ifindex =	dev_c++;
+						CONFIG.eths[eidx].iom_ifindex = j;
+#else /* FIX_IFINDEX */
+						CONFIG.eths[eidx].ifindex = j;
+#endif /* FIX_IFINDEX */
 					}
 				}	
 					    

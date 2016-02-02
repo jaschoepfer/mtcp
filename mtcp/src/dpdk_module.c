@@ -252,10 +252,17 @@ dpdk_send_pkts(struct mtcp_thread_context *ctxt, int nif)
 			 int temp;
 			 for(temp = 0; temp < cnt; temp++)
 			 {
-				 TRACE_CONFIG("    pkt%i: data_len=%hi, pkt_len=%i\n", temp, pkts[temp]->pkt.data_len, pkts[temp]->pkt.pkt_len);
+				 TRACE_CONFIG("    pkt%i: nif=%u, queue=%hi data_len=%hi, pkt_len=%i\n", temp, nif, ctxt->cpu, pkts[temp]->pkt.data_len, pkts[temp]->pkt.pkt_len);
 			 }
 			/* tx cnt # of packets */
-			ret = rte_eth_tx_burst(nif, ctxt->cpu, 
+#ifdef FIX_IFINDEX
+			TRACE_CONFIG("converting nif:%i to iom_nif for rte_eth_tx_burst...\n", nif);
+			int iom_nif = CONFIG.eths[nif].iom_ifindex;
+			TRACE_CONFIG("iom_nif:%i\n", iom_nif);
+			ret = rte_eth_tx_burst(iom_nif, ctxt->cpu,
+#else /* FIX_IFINDEX */
+			ret = rte_eth_tx_burst(nif, ctxt->cpu,
+#endif /* FIX_IFINDEX */	
 					       pkts, cnt);
 			pkts += ret;
 			cnt -= ret;
@@ -339,8 +346,12 @@ dpdk_recv_pkts(struct mtcp_thread_context *ctxt, int ifidx)
 		free_pkts(dpc->rmbufs[ifidx].m_table, dpc->rmbufs[ifidx].len);
 		dpc->rmbufs[ifidx].len = 0;
 	}
-
+#ifdef FIX_IFINDEX
+	int iom_ifidx = CONFIG.eths[ifidx].iom_ifindex;
+	ret = rte_eth_rx_burst((uint8_t)iom_ifidx, ctxt->cpu,
+#else /* FIX_IFINDEX */
 	ret = rte_eth_rx_burst((uint8_t)ifidx, ctxt->cpu,
+#endif /* FIX_IFINDEX */
 			       dpc->pkts_burst, MAX_PKT_BURST);
 
 	dpc->rmbufs[ifidx].len = ret;
@@ -534,7 +545,7 @@ dpdk_load_module(void)
 			/* init port */
 			printf("Initializing port %u... ", (unsigned) portid);
 			fflush(stdout);
-			TRACE_CONFIG("calling rte_eth_dev_conf with 4 queues\n",CONFIG.num_cores);
+			TRACE_CONFIG("calling rte_eth_dev_conf with %i queues\n",CONFIG.num_cores);
 			ret = rte_eth_dev_configure(portid, CONFIG.num_cores, CONFIG.num_cores, &port_conf);
 			if (ret < 0)
 				rte_exit(EXIT_FAILURE, "Cannot configure device: err=%d, port=%u\n",
