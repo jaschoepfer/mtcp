@@ -763,7 +763,7 @@ GetSender(mtcp_manager_t mtcp, tcp_stream *cur_stream)
 	if (cur_stream->sndvar->nif_out < 0) {
 		return mtcp->g_sender;
 
-	} else if (cur_stream->sndvar->nif_out >= CONFIG.num_devices) {
+	} else if (cur_stream->sndvar->nif_out >= CONFIG.eths_num) {
 		TRACE_ERROR("(NEVER HAPPEN) Failed to find appropriate sender.\n");
 		//Error may have to be removed, since nif_out may be set incorrectly
 		return NULL;
