@@ -39,7 +39,7 @@
 #define TCP_HEADER_LEN			20	// sizeof(struct tcphdr)
 #define TOTAL_TCP_HEADER_LEN	54	// total header length
 
-#define FIX_IFINDEX
+
 
 /* configrations */
 #define BACKLOG_SIZE (10*1024)
