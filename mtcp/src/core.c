@@ -1377,8 +1377,9 @@ mtcp_destroy_context(mctx_t mctx)
 	int ret, i;
 
 	TRACE_DBG("CPU %d: mtcp_destroy_context()\n", mctx->cpu);
-
-	/* close all stream sockets that are still open */
+	TRACE_CONFIG("destroy_context: closing open sockets...\n");
+	TRACE_CONFIG("TESTING: skipping instead\n");
+	/* close all stream sockets that are still open * SKIPPING FOR TEST PURPOSES *
 	if (!ctx->exit) {
 		for (i = 0; i < CONFIG.max_concurrency; i++) {
 			if (mtcp->smap[i].socktype == MTCP_SOCK_STREAM) {
@@ -1389,18 +1390,26 @@ mtcp_destroy_context(mctx_t mctx)
 			}
 		}
 	}
-
+	* SKIPPING FOR TEST PURPOSES */
+	TRACE_CONFIG("destroy_context: done closing sockets\n");
 	ctx->done = 1;
 
 	//pthread_kill(g_thread[mctx->cpu], SIGINT);
 	/* XXX - dpdk logic changes */
 	if (current_iomodule_func == &dpdk_module_func) {
 #ifndef DISABLE_DPDK
+		TRACE_CONFIG("waiting for thread to close from...");
 		int master = rte_get_master_lcore();
 		if (master == mctx->cpu)
+		{
+			TRACE_CONFIG("master core\n");
 			pthread_join(g_thread[mctx->cpu], NULL);
+		}
 		else
+		{
+			TRACE_CONFIG("non-master core\n");
 			rte_eal_wait_lcore(mctx->cpu);
+		}
 #endif /* !DISABLE_DPDK */
 	} else
 		pthread_join(g_thread[mctx->cpu], NULL);

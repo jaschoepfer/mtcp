@@ -263,10 +263,12 @@ mtcp_socket(mctx_t mctx, int domain, int type, int protocol)
 
 	mtcp = GetMTCPManager(mctx);
 	if (!mtcp) {
+		printf("socket(): context is NULL\n");
 		return -1;
 	}
 
 	if (domain != AF_INET) {
+		printf("socket(): domain(%d) not equal to AF_INET(%d)\n", domain, AF_INET);
 		errno = EAFNOSUPPORT;
 		return -1;
 	}
@@ -274,12 +276,14 @@ mtcp_socket(mctx_t mctx, int domain, int type, int protocol)
 	if (type == SOCK_STREAM) {
 		type = MTCP_SOCK_STREAM;
 	} else {
+		printf("socket(): type(%d) not equal to SOCK_STREAM(%d)\n", type, SOCK_STREAM);
 		errno = EINVAL;
 		return -1;
 	}
 
 	socket = AllocateSocket(mctx, type, FALSE);
 	if (!socket) {
+		printf("socket(): AllocateSocket() returned NULL\n");
 		errno = ENFILE;
 		return -1;
 	}
